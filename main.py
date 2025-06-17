@@ -27,7 +27,7 @@ def get_token_balance():
     return contract.functions.balanceOf(WALLET_ADDRESS).call()
 
 def send_telegram_alert(balance):
-    message = f"⚠️ Token balance exceeded: {balance} (threshold: {THRESHOLD}), diff: {((THRESHOLD - balance) / 1e18):.2f}"
+    message = f"⚠️ Token balance exceeded: {(balance / 1e18):.2f} (threshold: {(THRESHOLD / 1e18):.2f}), diff: {((balance - THRESHOLD) / 1e18):.2f}"
     if TG_BOT_TOKEN and TG_CHAT_ID:
         url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
         data = {
@@ -41,7 +41,8 @@ def main():
         balance = get_token_balance()
         print(f"Token balance: {(balance / 1e18):.2f}")
 
-        if balance > THRESHOLD:
+        if (balance - THRESHOLD) > 1e18:
+            print(f"Diff: {((balance - THRESHOLD)/1e18):.2f}")
             send_telegram_alert(balance)
     except Exception as e:
         print(f"Error: {e}")
